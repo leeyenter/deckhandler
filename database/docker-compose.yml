@@ -1,0 +1,33 @@
+version: "2.1"
+
+services:
+  db:
+    env_file: .env
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER_TEST}
+      POSTGRES_PASSWORD: ${DB_PASS_TEST}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_TEST}"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "${DB_PORT}5432"
+    networks:
+      - network
+
+  flyway:
+    image: flyway/flyway
+    depends_on:
+      db:
+        condition: service_healthy
+    command: -connectRetries=30 -url=jdbc:postgresql://db:5432/${DB_USER_TEST} -user=${DB_USER_TEST} -password=${DB_PASS_TEST} migrate
+    volumes:
+      - .:/flyway/sql
+    networks:
+      - network
+
+networks:
+  network:
+    name: network-${COMPOSE_NETWORK_NAME}
