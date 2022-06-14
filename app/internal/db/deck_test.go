@@ -22,7 +22,13 @@ var _ = Describe("DB deck queries", func() {
 	Describe("Deck management", func() {
 		It("should be able to create a shuffled deck", func() {
 			By("creating a new deck")
-			id, err := dbObj.CreateDeck(true, cards)
+
+			// Make a copy of input, as shuffle will be done in-place,
+			// and we don't want it to affect our 'reference'
+			cardsInput := make([]data.Card, len(cards))
+			copy(cardsInput, cards)
+
+			id, err := dbObj.CreateDeck(true, cardsInput)
 			Expect(err).To(BeNil())
 			Expect(id).ToNot(BeEmpty())
 

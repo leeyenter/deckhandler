@@ -79,7 +79,11 @@ func (d *Database) FetchCardsFromDeck(id string, count int) ([]data.Card, error)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	const query = `SELECT code, value FROM deck_cards INNER JOIN cards ON cards.code = deck_cards.card_code WHERE deck_id = $1`
+	const query = `SELECT code, value FROM deck_cards 
+		INNER JOIN cards ON cards.code = deck_cards.card_code 
+		WHERE deck_id = $1
+		ORDER BY deck_cards.id ASC
+		`
 	var rows pgx.Rows
 	var err error
 

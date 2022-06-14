@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	db.Init("assets/cards.csv")
+	db.Init("")
 
 	r, err := router.New()
 	if err != nil {

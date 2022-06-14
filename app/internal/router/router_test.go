@@ -21,8 +21,8 @@ func TestDeckhandler(t *testing.T) {
 	RunSpecs(t, "Internal Routes Suite")
 }
 
-func parseDeck(rec *httptest.ResponseRecorder) router.DeckResponse {
-	var resp router.DeckResponse
+func parseDeck(rec *httptest.ResponseRecorder) router.DeckResponseWithCards {
+	var resp router.DeckResponseWithCards
 	Expect(json.Unmarshal(rec.Body.Bytes(), &resp)).To(Succeed())
 	return resp
 }

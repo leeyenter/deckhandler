@@ -2,14 +2,13 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/leeyenter/deckhandler/internal/data"
+	"github.com/jackc/pgx/v4/log/zapadapter"
+	"github.com/leeyenter/deckhandler/logger"
 )
 
 const timeout = time.Second * 2
@@ -31,6 +30,9 @@ func Init(file string) (*Database, error) {
 		if err != nil {
 			log.Fatalln("Unable to parse database config:", err)
 		}
+
+		config.Logger = zapadapter.NewLogger(logger.Get("DB"))
+		config.LogLevel = pgx.LogLevelWarn
 
 		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		defer cancel()
@@ -56,65 +58,10 @@ func Init(file string) (*Database, error) {
 // GetDB returns the singleton database instance
 func GetDB() (*Database, error) {
 	var err error
-	once.Do(func() {
-		// If haven't yet initialised the database,
-		// init with values for running tests
-		singleton = &Database{}
-		err = singleton.Init("../../assets/cards.csv")
-	})
+	// once.Do(func() {
+	// If haven't yet initialised the database,
+	// init with values for running tests
+	Init("../../assets/cards.csv")
+	// })
 	return singleton, err
-}
-
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return fallback
-	}
-	return value
-}
-
-func getDbConnStr() string {
-	dbUser := getenv("DB_USER", "deckhandler")
-	dbPass := getenv("DB_PASS", "wmWLWyoqsKJtXwisAqwaPkA9yT8MvrzRj")
-	dbHost := getenv("DB_HOST", "127.0.0.1")
-	dbPort := getenv("DB_PORT", "5432")
-	return fmt.Sprintf("dbname=%s user=%s password=%s host=%s port=%s", dbUser, dbUser, dbPass, dbHost, dbPort)
-}
-
-func (d *Database) Init(file string) error {
-	config, err := pgx.ParseConfig(getDbConnStr())
-	if err != nil {
-		log.Fatalln("Unable to parse database config:", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	if d.Conn, err = pgx.ConnectConfig(ctx, config); err != nil {
-		return err
-	}
-
-	return d.seedData(file) // Included here to make development easier/cleaner
-}
-
-// Clears all existing data in the database,
-// and adds in the cards data.
-func (d *Database) seedData(file string) error {
-	if err := d.ClearCards(); err != nil {
-		return err
-	}
-
-	if err := d.ClearDecks(); err != nil {
-		return err
-	}
-
-	cards, err := data.LoadCSVFile(file)
-	if err != nil {
-		return err
-	}
-
-	if err = d.CreateCards(cards); err != nil {
-		return err
-	}
-
-	return nil
 }
