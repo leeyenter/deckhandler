@@ -81,7 +81,7 @@ func (r *Router) CreateDeck(c echo.Context) error {
 	resp.Shuffled = shuffledBool
 	resp.Remaining = len(deckCards)
 
-	return c.JSON(http.StatusOK, resp)
+	return c.JSON(http.StatusCreated, resp)
 }
 
 // OpenDeck takes a URL param `id`, and retrieves data about the deck
