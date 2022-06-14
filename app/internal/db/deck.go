@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/leeyenter/deckhandler/internal/data"
+	"github.com/leeyenter/deckhandler/logger"
 )
 
 // CreateDeck creates a deck in the database,
@@ -23,6 +24,7 @@ func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) 
 
 	tx, err := d.Conn.Begin(ctx)
 	if err != nil {
+		logger.Get("DB-DECK").Error("CreateDeck: Transaction failed - " + err.Error())
 		return "", err
 	}
 
@@ -31,11 +33,13 @@ func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) 
 	row := tx.QueryRow(ctx, `INSERT INTO decks (shuffled) VALUES ($1) RETURNING id`, shuffled)
 	var id string
 	if err := row.Scan(&id); err != nil {
+		logger.Get("DB-DECK").Error("CreateDeck: Insert deck failed - " + err.Error())
 		return "", err
 	}
 
 	for _, card := range cards {
 		if _, err := tx.Exec(ctx, `INSERT INTO deck_cards (deck_id, card_code) VALUES ($1, $2)`, id, card.ID); err != nil {
+			logger.Get("DB-DECK").Error("CreateDeck: Insert card failed - " + err.Error())
 			return "", err
 		}
 	}
@@ -54,6 +58,7 @@ func (d *Database) GetDeck(id string) (data.Deck, error) {
 
 	row := d.Conn.QueryRow(ctx, `SELECT shuffled FROM decks WHERE id = $1`, id)
 	if err := row.Scan(&deck.Shuffled); err != nil {
+		logger.Get("DB-DECK").Error("GetDeck: Select failed - " + err.Error())
 		return deck, err
 	}
 
@@ -82,6 +87,7 @@ func (d *Database) FetchCardsFromDeck(id string, count int) ([]data.Card, error)
 	}
 
 	if err != nil {
+		logger.Get("DB-DECK").Error("FetchCardsFromDeck: Select failed - " + err.Error())
 		return nil, err
 	}
 
@@ -90,6 +96,7 @@ func (d *Database) FetchCardsFromDeck(id string, count int) ([]data.Card, error)
 	for rows.Next() {
 		var card data.Card
 		if err = rows.Scan(&card.ID, &card.Values); err != nil {
+			logger.Get("DB-DECK").Error("FetchCardsFromDeck: Scan failed - " + err.Error())
 			return nil, err
 		} else {
 			cards = append(cards, card)
@@ -108,6 +115,7 @@ func (d *Database) RemoveCardsFromDeck(id string, cardCodes []string) error {
 	for _, cardCode := range cardCodes {
 		_, err := d.Conn.Exec(ctx, `DELETE FROM deck_cards WHERE deck_id = $1 AND card_code = $2`, id, cardCode)
 		if err != nil {
+			logger.Get("DB-DECK").Error("RemoveCardsFromDeck - " + err.Error())
 			return err
 		}
 	}
@@ -121,7 +129,9 @@ func (d *Database) ClearDecks() error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := d.Conn.Exec(ctx, `DELETE FROM decks`)
+	if _, err := d.Conn.Exec(ctx, `DELETE FROM decks`); err != nil {
+		logger.Get("DB-DECK").Error("ClearDecks - " + err.Error())
+	}
 
-	return err
+	return nil
 }
