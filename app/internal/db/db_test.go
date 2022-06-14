@@ -17,7 +17,7 @@ func TestDatabase(t *testing.T) {
 var _ = Describe("Connect to database", func() {
 	It("should be able to connect to the DB", func() {
 		dbObj, err := db.GetDB()
-		Expect(dbObj.Conn.Ping(context.Background())).To(BeNil())
 		Expect(err).To(BeNil())
+		Expect(dbObj.Conn.Ping(context.Background())).To(BeNil())
 	})
 })

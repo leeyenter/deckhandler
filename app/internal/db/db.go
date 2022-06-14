@@ -62,6 +62,8 @@ func (d *Database) init() error {
 		return err
 	}
 
+	// return nil
+
 	return d.seedData()
 }
 

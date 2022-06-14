@@ -23,20 +23,16 @@ var _ = Describe("DB deck queries", func() {
 		It("should be able to create a shuffled deck", func() {
 			By("creating a new deck")
 			id, err := dbObj.CreateDeck(true, cards)
-			Expect(id).ToNot(BeEmpty())
 			Expect(err).To(BeNil())
+			Expect(id).ToNot(BeEmpty())
 
 			By("retrieving information on the deck")
-			Expect(dbObj.GetDeck(id)).To(Equal(data.Deck{
-				ID:       id,
-				Shuffled: true,
-			}))
-
-			By("fetching the cards in the deck")
-			fetchedCards, err := dbObj.FetchCardsFromDeck(id, -1)
+			deck, err := dbObj.GetDeck(id)
 			Expect(err).To(BeNil())
-			Expect(len(fetchedCards)).To(Equal(len(cards)))
-			Expect(fetchedCards).NotTo(Equal(cards)) // should be shuffled
+			Expect(deck.ID).To(Equal(id))
+			Expect(deck.Shuffled).To(Equal(true))
+			Expect(len(deck.Cards)).To(Equal(len(cards)))
+			Expect(deck.Cards).NotTo(Equal(cards)) // should be shuffled
 		})
 
 		It("should be able to create a smaller deck", func() {
@@ -50,10 +46,8 @@ var _ = Describe("DB deck queries", func() {
 			Expect(dbObj.GetDeck(id)).To(Equal(data.Deck{
 				ID:       id,
 				Shuffled: false,
+				Cards:    subset,
 			}))
-
-			By("fetching the cards in the deck")
-			Expect(dbObj.FetchCardsFromDeck(id, -1)).To(Equal(subset))
 		})
 
 		It("should be able to create an unshuffled deck", func() {
@@ -66,6 +60,7 @@ var _ = Describe("DB deck queries", func() {
 			Expect(dbObj.GetDeck(id)).To(Equal(data.Deck{
 				ID:       id,
 				Shuffled: false,
+				Cards:    cards,
 			}))
 
 			By("fetching all the cards in the deck")
@@ -75,10 +70,14 @@ var _ = Describe("DB deck queries", func() {
 			Expect(dbObj.FetchCardsFromDeck(id, 5)).To(Equal(cards[:5]))
 
 			By("removing the first 5 cards in the deck")
-			Expect(dbObj.RemoveCardsFromDeck(id, 5)).To(Succeed())
+			cardCodes := make([]string, 0)
+			for _, card := range cards[:5] {
+				cardCodes = append(cardCodes, card.ID)
+			}
+			Expect(dbObj.RemoveCardsFromDeck(id, cardCodes)).To(Succeed())
 
 			By("fetching 5 more cards in the deck")
-			Expect(dbObj.FetchCardsFromDeck(id, 5)).To(Equal(Equal(cards[5:10])))
+			Expect(dbObj.FetchCardsFromDeck(id, 5)).To(Equal(cards[5:10]))
 
 			By("fetching all of the remaining cards in the deck")
 			Expect(dbObj.FetchCardsFromDeck(id, -1)).To(Equal(cards[5:]))
