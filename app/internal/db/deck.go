@@ -10,7 +10,7 @@ import (
 // given a list of cards and whether they should
 // be shuffled. Returns the id.
 func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) {
-	d.Conn.Exec()
+	// d.Conn.Exec()
 	return "", errors.New("not implemented")
 }
 
@@ -19,14 +19,20 @@ func (d *Database) GetDeck(id string) (data.Deck, error) {
 	return data.Deck{}, errors.New("not implemented")
 }
 
-// FetchCards returns the first `count` cards in a deck
+// FetchCardsFromDeck returns the first `count` cards in a deck
 // of a given `id`. If `count` is -1, return the whole deck.
-func (d *Database) FetchCards(id string, count int) ([]data.Card, error) {
+func (d *Database) FetchCardsFromDeck(id string, count int) ([]data.Card, error) {
 	return nil, errors.New("not implemented")
 }
 
-// RemoveCards removes the first `count` cards in a deck
+// RemoveCardsFromDeck removes the first `count` cards in a deck
 // of given `id`.
-func (d *Database) RemoveCards(id string, count int) error {
+func (d *Database) RemoveCardsFromDeck(id string, count int) error {
+	return errors.New("not implemented")
+}
+
+// ClearDecks is a helper function that removes
+// all decks in the database. Used mainly for testing.
+func (d *Database) ClearDecks() error {
 	return errors.New("not implemented")
 }
