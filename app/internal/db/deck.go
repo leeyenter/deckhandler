@@ -44,9 +44,12 @@ func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) 
 		}
 	}
 
-	err = tx.Commit(ctx)
+	if err = tx.Commit(ctx); err != nil {
+		logger.Get("DB-DECK").Error("CreateDeck: Committing - " + err.Error())
+		return "", err
+	}
 
-	return id, err
+	return id, nil
 }
 
 // GetDeck retrieves information of deck `id`.
