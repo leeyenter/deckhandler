@@ -3,11 +3,12 @@
 ## Setup
 
 The list of cards that are to be used, and will be loaded into the database,
-should be placed in `assets` folder. By default, the application reads `assets/cards.csv`.
+should be placed in `app/assets` folder. By default, the application reads `app/assets/cards.csv`.
 
-The data should be ordered sequentially. The first row should be the header,
-and the first column should be the card codes, which will be used to identify
-the cards. The remaining columns are flexible and automatically parsed.
+The first row should be the header, and the remaining data should be ordered sequentially.
+
+The first column should be the card codes, which will be used to identify the cards.
+The remaining columns are flexible and automatically parsed.
 
 ## Running the Code
 
@@ -20,14 +21,14 @@ docker-compose up
 
 2. To run tests
 
-```
+```shell
 cd app
 ginkgo -r
 ```
 
 3. To run the backend
 
-```
+```shell
 cd app
 go build
 ./deckhandler
