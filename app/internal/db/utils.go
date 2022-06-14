@@ -3,25 +3,17 @@ package db
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgconn"
 	"github.com/leeyenter/deckhandler/internal/data"
+	"github.com/leeyenter/deckhandler/internal/utils"
 )
 
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return fallback
-	}
-	return value
-}
-
 func getDbConnStr() string {
-	dbUser := getenv("DB_USER", "deckhandler")
-	dbPass := getenv("DB_PASS", "wmWLWyoqsKJtXwisAqwaPkA9yT8MvrzRj")
-	dbHost := getenv("DB_HOST", "127.0.0.1")
-	dbPort := getenv("DB_PORT", "5432")
+	dbUser := utils.Getenv("DB_USER", "deckhandler")
+	dbPass := utils.Getenv("DB_PASS", "wmWLWyoqsKJtXwisAqwaPkA9yT8MvrzRj")
+	dbHost := utils.Getenv("DB_HOST", "127.0.0.1")
+	dbPort := utils.Getenv("DB_PORT", "5432")
 	return fmt.Sprintf("dbname=%s user=%s password=%s host=%s port=%s", dbUser, dbUser, dbPass, dbHost, dbPort)
 }
 

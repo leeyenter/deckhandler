@@ -45,7 +45,6 @@ var _ = Describe("Create Deck", func() {
 	})
 
 	It("should create an unshuffled deck if shuffled is not passed in", func() {
-		By("making the request")
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
 		c := e.NewContext(req, rec)
 		Expect(r.CreateDeck(c)).To(Succeed())

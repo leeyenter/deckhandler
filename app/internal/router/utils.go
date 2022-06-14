@@ -7,6 +7,7 @@ import (
 	"github.com/leeyenter/deckhandler/logger"
 )
 
+// Middleware to uuse zapcore logging for the router
 func routerLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		otherInfo := ""
@@ -33,6 +34,7 @@ func routerLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+// Helper function to quickly generate JSON error message
 func generateError(message string) map[string]string {
 	return map[string]string{
 		"error": message,

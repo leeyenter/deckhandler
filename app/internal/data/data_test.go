@@ -28,3 +28,25 @@ var _ = Describe("Load CSV", func() {
 		Expect(cards).To(BeNil())
 	})
 })
+
+var _ = Describe("ToMap", func() {
+	It("should correctly format a card to map", func() {
+		card := data.Card{
+			ID: "hello",
+			Values: map[string]string{
+				"value1": "a",
+				"value2": "b",
+				"value3": "c",
+			},
+		}
+
+		cardMap := card.ToMap()
+
+		Expect(cardMap).To(Equal(map[string]interface{}{
+			"code":   "hello",
+			"value1": "a",
+			"value2": "b",
+			"value3": "c",
+		}))
+	})
+})

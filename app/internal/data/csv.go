@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+// LoadCSVFile parses a CSV file that contains
+// the list of cards that should be loaded into the database.
+// The first row should be the header.
+// The first column should be the card code, which will be used
+// as a primary key to identify the card.
 func LoadCSVFile(file string) ([]Card, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -35,7 +40,7 @@ func LoadCSVFile(file string) ([]Card, error) {
 				return nil, errors.New("inconsistent number of column headings")
 			}
 
-			// Record
+			// Save record
 			var card Card
 			card.ID = record[0]
 			card.Values = make(map[string]string, len(headers))

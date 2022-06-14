@@ -3,6 +3,7 @@ module github.com/leeyenter/deckhandler
 go 1.18
 
 require (
+	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/labstack/gommon v0.3.1
@@ -13,7 +14,6 @@ require (
 
 require (
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.12.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.0 // indirect

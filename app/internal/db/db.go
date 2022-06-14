@@ -47,7 +47,10 @@ func Init(file string) (*Database, error) {
 		if file != "" {
 			err = singleton.seedData(file)
 			if err != nil {
+				logger.Get("DB").Error("Error seeding database")
 				return
+			} else {
+				logger.Get("DB").Info("Database successfully seeded")
 			}
 		}
 
@@ -58,10 +61,6 @@ func Init(file string) (*Database, error) {
 // GetDB returns the singleton database instance
 func GetDB() (*Database, error) {
 	var err error
-	// once.Do(func() {
-	// If haven't yet initialised the database,
-	// init with values for running tests
-	Init("../../assets/cards.csv")
-	// })
+	Init("../../assets/cards.csv") // call init with testing-suitable path for seeding the database
 	return singleton, err
 }
