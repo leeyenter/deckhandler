@@ -21,19 +21,28 @@ func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) 
 		})
 	}
 
-	row := d.Conn.QueryRow(ctx, `INSERT INTO decks (shuffled) VALUES ($1) RETURNING id`, shuffled)
+	tx, err := d.Conn.Begin(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	defer tx.Rollback(ctx)
+
+	row := tx.QueryRow(ctx, `INSERT INTO decks (shuffled) VALUES ($1) RETURNING id`, shuffled)
 	var id string
 	if err := row.Scan(&id); err != nil {
 		return "", err
 	}
 
 	for _, card := range cards {
-		if _, err := d.Conn.Exec(ctx, `INSERT INTO deck_cards (deck_id, card_code) VALUES ($1, $2)`, id, card.ID); err != nil {
+		if _, err := tx.Exec(ctx, `INSERT INTO deck_cards (deck_id, card_code) VALUES ($1, $2)`, id, card.ID); err != nil {
 			return "", err
 		}
 	}
 
-	return id, nil
+	err = tx.Commit(ctx)
+
+	return id, err
 }
 
 // GetDeck retrieves information of deck `id`.

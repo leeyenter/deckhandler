@@ -24,9 +24,7 @@ var _ = Describe("DB card queries", func() {
 			Expect(dbObj.ClearCards()).To(Succeed())
 
 			By("adding the cards")
-			for _, card := range cards {
-				Expect(dbObj.CreateCard(card)).To(Succeed())
-			}
+			Expect(dbObj.CreateCards(cards)).To(Succeed())
 
 			By("retrieving the cards")
 			Expect(dbObj.FetchCards()).To(Equal(cards))

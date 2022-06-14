@@ -62,9 +62,7 @@ func (d *Database) init() error {
 		return err
 	}
 
-	// return nil
-
-	return d.seedData()
+	return d.seedData() // Included here to make development easier/cleaner
 }
 
 // Clears all existing data in the database,
@@ -83,11 +81,8 @@ func (d *Database) seedData() error {
 		return err
 	}
 
-	for _, card := range cards {
-		err = d.CreateCard(card)
-		if err != nil {
-			return err
-		}
+	if err = d.CreateCards(cards); err != nil {
+		return err
 	}
 
 	return nil

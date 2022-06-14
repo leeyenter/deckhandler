@@ -6,19 +6,30 @@ import (
 	"github.com/leeyenter/deckhandler/internal/data"
 )
 
-// CreateCard adds a new card into the database, that
+// CreateCards adds a list of new cards into the database, that
 // can subsequently be added into decks.
-func (d *Database) CreateCard(card data.Card) error {
+func (d *Database) CreateCards(cards []data.Card) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := d.Conn.Exec(
-		ctx,
-		`INSERT INTO cards (code, value) VALUES ($1, $2)`,
-		card.ID, card.Values,
-	)
+	tx, err := d.Conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	defer tx.Rollback(ctx)
+
+	for _, card := range cards {
+		if _, err := tx.Exec(
+			ctx,
+			`INSERT INTO cards (code, value) VALUES ($1, $2)`,
+			card.ID, card.Values,
+		); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit(ctx)
 }
 
 // FetchCards retrieves all cards from the database.
