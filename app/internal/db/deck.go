@@ -44,9 +44,12 @@ func (d *Database) CreateDeck(shuffled bool, cards []data.Card) (string, error) 
 		}
 	}
 
-	err = tx.Commit(ctx)
+	if err = tx.Commit(ctx); err != nil {
+		logger.Get("DB-DECK").Error("CreateDeck: Committing - " + err.Error())
+		return "", err
+	}
 
-	return id, err
+	return id, nil
 }
 
 // GetDeck retrieves information of deck `id`.
@@ -76,7 +79,11 @@ func (d *Database) FetchCardsFromDeck(id string, count int) ([]data.Card, error)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	const query = `SELECT code, value FROM deck_cards INNER JOIN cards ON cards.code = deck_cards.card_code WHERE deck_id = $1`
+	const query = `SELECT code, value FROM deck_cards 
+		INNER JOIN cards ON cards.code = deck_cards.card_code 
+		WHERE deck_id = $1
+		ORDER BY deck_cards.id ASC
+		`
 	var rows pgx.Rows
 	var err error
 

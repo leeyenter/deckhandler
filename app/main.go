@@ -2,19 +2,22 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/leeyenter/deckhandler/internal/db"
+	"github.com/leeyenter/deckhandler/internal/router"
 )
 
-var dbObj *db.Database
+// var dbObj *db.Database
 
 func main() {
-	var err error
 
-	dbObj, err = db.GetDB()
+	db.Init("")
+
+	r, err := router.New()
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
+
+	server := r.BuildServer()
+	server.Start(":3000")
 }
