@@ -58,7 +58,7 @@ var _ = Describe("Create Deck", func() {
 	})
 
 	It("should create an unshuffled deck if shuffled is 'false'", func() {
-		req := httptest.NewRequest(http.MethodPost, "/?shuffled=false", nil)
+		req := httptest.NewRequest(http.MethodPost, "/?shuffle=false", nil)
 		c := e.NewContext(req, rec)
 		Expect(r.CreateDeck(c)).To(Succeed())
 		Expect(rec.Code).To(BeNumerically("<", 300))
@@ -70,7 +70,7 @@ var _ = Describe("Create Deck", func() {
 	})
 
 	It("should create a shuffled deck if shuffled is 'true'", func() {
-		req := httptest.NewRequest(http.MethodPost, "/?shuffled=true", nil)
+		req := httptest.NewRequest(http.MethodPost, "/?shuffle=true", nil)
 		c := e.NewContext(req, rec)
 		Expect(r.CreateDeck(c)).To(Succeed())
 		Expect(rec.Code).To(BeNumerically("<", 300))
@@ -82,7 +82,7 @@ var _ = Describe("Create Deck", func() {
 	})
 
 	It("should fail if shuffled is set to an unrecognised value", func() {
-		req := httptest.NewRequest(http.MethodPost, "/?shuffled=unrecognised", nil)
+		req := httptest.NewRequest(http.MethodPost, "/?shuffle=unrecognised", nil)
 		c := e.NewContext(req, rec)
 		Expect(r.CreateDeck(c)).To(Succeed())
 		Expect(rec.Code).To(Equal(http.StatusBadRequest))

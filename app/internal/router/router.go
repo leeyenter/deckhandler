@@ -12,7 +12,8 @@ import (
 )
 
 type Router struct {
-	DB *db.Database
+	DB     *db.Database
+	Server string
 }
 
 func New() (*Router, error) {
@@ -25,18 +26,27 @@ func New() (*Router, error) {
 	return &r, nil
 }
 
+func (r *Router) BuildServer() *echo.Echo {
+	e := echo.New()
+	e.POST("/", r.CreateDeck)
+	e.GET("/:id", r.OpenDeck)
+	e.POST("/:id/draw", r.DrawCards)
+
+	return e
+}
+
 type DeckResponse struct {
 	DeckID    string                   `json:"deck_id"`
 	Shuffled  bool                     `json:"shuffled"`
 	Remaining int                      `json:"remaining"`
-	Cards     []map[string]interface{} `json:"cards"`
+	Cards     []map[string]interface{} `json:"cards,omitempty"`
 }
 
 // POST /
 // URL params may include `cards`, `shuffled`
 func (r *Router) CreateDeck(c echo.Context) error {
 	cards := c.QueryParam("cards")
-	shuffled := c.QueryParam("shuffled")
+	shuffled := c.QueryParam("shuffle")
 
 	if shuffled != "" && shuffled != "true" && shuffled != "false" {
 		logger.Get("ROUTER").Info("Unrecognised shuffled value: " + shuffled)
