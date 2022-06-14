@@ -27,7 +27,7 @@ func LoadCSVFile(file string) ([]Card, error) {
 		if idx == 0 {
 			// Headers
 			for headerIdx, header := range record[1:] {
-				headers[header] = headerIdx
+				headers[header] = headerIdx + 1
 			}
 		} else {
 			// Check record length first

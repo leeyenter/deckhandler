@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/leeyenter/deckhandler/internal/data"
 )
 
 const timeout = time.Second * 2
@@ -57,7 +58,32 @@ func (d *Database) init() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	d.Conn, err = pgx.ConnectConfig(ctx, config)
+	if d.Conn, err = pgx.ConnectConfig(ctx, config); err != nil {
+		return err
+	}
 
-	return err
+	return d.seedData() // Included here to make development easier/cleaner
+}
+
+// Clears all existing data in the database,
+// and adds in the cards data.
+func (d *Database) seedData() error {
+	if err := d.ClearCards(); err != nil {
+		return err
+	}
+
+	if err := d.ClearDecks(); err != nil {
+		return err
+	}
+
+	cards, err := data.LoadCSVFile("../../assets/cards.csv")
+	if err != nil {
+		return err
+	}
+
+	if err = d.CreateCards(cards); err != nil {
+		return err
+	}
+
+	return nil
 }
