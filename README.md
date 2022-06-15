@@ -45,3 +45,11 @@ The app also uses the following environment variables:
 | `DB_PASS`    | Database account password                   | `wmWLWyoqsKJtXwisAqwaPkA9yT8MvrzRj` |
 | `DB_HOST`    | Database host                               | `127.0.0.1`                         |
 | `DB_PORT`    | Database port                               | `5432`                              |
+
+## APIs
+
+| Method | Path        | Name              | Params                                                                                                                                                                                                    |
+| ------ | ----------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/`         | Create a new Deck | `cards`: optional; comma-separated list of card codes to include. If not included, will use the full deck.<br />`shuffle`: optional; `true` or `false`, whether to shuffle the deck. Defaults to `false`. |
+| GET    | `/:id`      | Open a Deck       | None                                                                                                                                                                                                      |
+| POST   | `/:id/draw` | Draw a Card       | `count`: required; number of cards to draw.                                                                                                                                                               |
